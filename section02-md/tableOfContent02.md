@@ -286,7 +286,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
 - Next.js에서 API를 구축할 수 있게 해주는 기능
 
-- pages/api 디레토리 하위에 파일 생성시 api 응답을 정의하는 코드로 설정
+- pages/api 디렉토리 하위에 파일 생성 후 api 응답을 정의하는 코드 작성
 
 ```ts
 // pages/api/time.ts
