@@ -1,13 +1,30 @@
-import { GetServerSidePropsContext, InferGetStaticPropsType } from "next";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import style from "./[id].module.css";
 import fetchOneBook from "@/lib/fetch-one-book";
+import { useRouter } from "next/router";
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
+export const getStaticPaths = () => {
+  return {
+    paths: [
+      // url parameter의 값들은 문자열로만 설정
+      { params: { id: "1" } },
+      { params: { id: "2" } },
+      { params: { id: "3" } }
+    ],
+    fallback: true
+  };
+};
+
+export const getStaticProps = async (context: GetStaticPropsContext) => {
   const id = context.params!.id;
 
   const book = await fetchOneBook(Number(id));
+
+  if (!book) {
+    return {
+      notFound: true
+    };
+  }
 
   return {
     props: { book }
@@ -16,11 +33,14 @@ export const getServerSideProps = async (
 
 export default function Page({
   book
-}: Readonly<InferGetStaticPropsType<typeof getServerSideProps>>) {
+}: Readonly<InferGetStaticPropsType<typeof getStaticProps>>) {
+  const router = useRouter();
+
+  if (router.isFallback) return "로딩 중입니다.";
+
   if (!book) return "문제가 발생했습니다. 다시 시도하세요.";
 
-  const { id, title, subTitle, description, author, publisher, coverImgUrl } =
-    book;
+  const { title, subTitle, description, author, publisher, coverImgUrl } = book;
 
   return (
     <div className={style.container}>
