@@ -599,3 +599,389 @@ export default function Home() {
   | React-app의 데이터페칭                                                          | Next-app의 데이터페칭                                                                                                |
   | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
   | 컴포넌트 마운트 이후에 발생함 <br /> 데이터 요청 시점이 느려지게 되는 단점 발생 | 사전 렌더링 중 발생함(당연히 컴포넌트 마운트 이후에도 발생 가능) <br /> 데이터 요청 시점이 매우 빨라지는 장점이 있음 |
+
+<br />
+
+### **`tableOfContent02-1, 2, 3`**
+
+- SSR vs SSG vs ISR
+
+  | 특징              | SSR                                | SSG                                       | ISR                                                                     |
+  | ----------------- | ---------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- |
+  | HTML 생성 시점    | 요청 시마다 서버에서 즉시 생성     | 빌드 시점에 미리 생성 후 캐시             | 빌드 시점에 생성되며, 이후 설정된 주기에 따라 백그라운드에서 갱신       |
+  | JS 실행 위치      | 서버와 클라이언트 모두             | 클라이언트 측                             | 클라이언트 측                                                           |
+  | Hydration 과정    | 서버 렌더링 된 HTML 위에 번들 적용 | 정적 HTML 위에 번들 적용                  | 정적 HTML 위에 번들 적용                                                |
+  | 성능 및 활용 사례 | 실시간 데이터 처리 필요 시 적합    | 정적 콘텐츠 제공 및 빠른 로딩 속도에 적합 | 자주 변경되는 콘텐츠(블로그, 뉴스 등)에 적합하며, 최신 데이터 유지 가능 |
+
+<br />
+
+- JS(HTML) vs JS 번들
+
+  | 특징         | JS(HTML)                                  | JS 번들                                                   |
+  | ------------ | ----------------------------------------- | --------------------------------------------------------- |
+  | 정의         | 사전 렌더링의 결과물로 생성된 정적 HTML   | 페이지와 관련된 모든 JavaScript 코드를 포함하는 통합 파일 |
+  | 생성 시점    | 서버에서 사전 렌더링 시                   | 빌드 과정에서 번들링                                      |
+  | 목적         | 초기 UI를 빠르게 표시                     | 페이지의 동적 기능 제공                                   |
+  | 실행 위치    | 서버 (SSR) 또는 빌드 시 (SSG)             | 클라이언트 (브라우저)                                     |
+  | 로딩 순서    | 먼저 로드됨                               | HTML 로드 후 로드됨                                       |
+  | 역할         | 기본적인 페이지 구조와 콘텐츠 제공        | 인터랙티브 기능 및 동적 업데이트 담당                     |
+  | SEO 영향     | 긍정적 (검색 엔진이 콘텐츠를 쉽게 인덱싱) | 직접적인 영향 적음                                        |
+  | 하이드레이션 | 하이드레이션의 대상                       | 하이드레이션을 수행하는 코드 포함                         |
+
+<br />
+
+- ISR 주문형 재 검증(On-Demand-ISR)
+
+  - On-Demand-ISR: 요청을 받을 때 마다 페이지를 다시 생성하는 ISR
+
+  - 시간을 기반으로 불필요하거나 너무 늦게 페이지를 재생성하는 과정 제거
+
+  - 실제 사용자의 요청에 따라 페이지 재생성: 페이지 요청 직접 트리거링 가능
+
+  - api 요청으로 핸들러 실행하여 적용 가능
+
+<br />
+
+### **`SEO 설정하기`**
+
+- favicon, thumbnail 등 정적 리소스, 페이지별 meta 태그 사용
+
+- 각 페이지별로 메타 태그 적용을 위해 next/head를 통해 Head import
+
+  - next/document의 Head는 \_document.tsx 파일에서만 사용
+
+  - og(open graph): 웹 페이지가 소셜 미디어 플랫폼이나 메시징 앱에서 공유될 때 어떻게 표시될지를 제어하는 데 사용
+
+- pages/index.tsx
+
+  - search/index.tsx도 같은 형태로 적용
+
+  ```ts
+  import SearchableLayout from "@/components/searchable-layout";
+  import style from "./index.module.css";
+  import { ReactNode } from "react";
+  import BookItem from "@/components/book-item";
+  import { InferGetStaticPropsType } from "next";
+  import fetchBooks from "@/lib/fetch-books";
+  import fetchRandomBooks from "@/lib/fetch-random-books";
+  import { BookData } from "@/types";
+  import Head from "next/head";
+
+  export const getStaticProps = async () => {
+    const [allBooks, recoBooks] = await Promise.all([
+      fetchBooks(),
+      fetchRandomBooks()
+    ]);
+
+    return {
+      props: {
+        allBooks,
+        recoBooks
+      }
+    };
+  };
+
+  export default function Home({
+    allBooks,
+    recoBooks
+  }: Readonly<InferGetStaticPropsType<typeof getStaticProps>>) {
+    return (
+      <>
+        {/* 메타 태그 적용 */}
+        <Head>
+          <title>한입북스</title>
+          <meta property="og:image" content="/thumbnail.png" />
+          <meta property="og:title" content="한입북스" />
+          <meta
+            property="og:description"
+            content="한입북스에 등록된 도서들을 만나보세요"
+          />
+        </Head>
+
+        <div className={style.container}>
+          <section>
+            <h3>지금 추천하는 도서</h3>
+            {recoBooks.map((book: BookData) => (
+              <BookItem key={book.id} {...book} />
+            ))}
+          </section>
+          <section>
+            <h3>등록된 모든 도서</h3>
+            {allBooks.map((book: BookData) => (
+              <BookItem key={book.id} {...book} />
+            ))}
+          </section>
+        </div>
+      </>
+    );
+  }
+
+  Home.getLayout = (page: ReactNode) => {
+    return <SearchableLayout>{page}</SearchableLayout>;
+  };
+  ```
+
+- book/[id].tsx처럼 fallback을 사용하는 다니나믹 정적 페이지에서의 메타 태그 사용
+
+  - 조건문을 통한 loading 상태에서의 기본적 메타 태그 사용: book의 데이터가 없는 경우 메타 태그 미적용 -> SEO 동작 X
+
+  ```ts
+  import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
+  import style from "./[id].module.css";
+  import fetchOneBook from "@/lib/fetch-one-book";
+  import { useRouter } from "next/router";
+  import Head from "next/head";
+
+  export const getStaticPaths = () => {
+    return {
+      paths: [
+        { params: { id: "1" } },
+        { params: { id: "2" } },
+        { params: { id: "3" } }
+      ],
+      fallback: true
+    };
+  };
+
+  export const getStaticProps = async (context: GetStaticPropsContext) => {
+    const id = context.params!.id;
+
+    const book = await fetchOneBook(Number(id));
+
+    if (!book) {
+      return {
+        notFound: true
+      };
+    }
+
+    return {
+      props: { book }
+    };
+  };
+
+  export default function Page({
+    book
+  }: Readonly<InferGetStaticPropsType<typeof getStaticProps>>) {
+    const router = useRouter();
+
+    // fallback 상태일 때의 기본적인 메타 태그
+    if (router.isFallback) {
+      return (
+        <>
+          <Head>
+            <title>한입북스</title>
+            <meta property="og:image" content="/thumbnail.png" />
+            <meta property="og:title" content="한입북스" />
+            <meta
+              property="og:description"
+              content="한입북스에 등록된 도서들을 만나보세요"
+            />
+          </Head>
+          <div>로딩중입니다</div>
+        </>
+      );
+    }
+
+    if (!book) return "문제가 발생했습니다. 다시 시도하세요.";
+
+    const { title, subTitle, description, author, publisher, coverImgUrl } =
+      book;
+
+    return (
+      <>
+        <Head>
+          <title>{title}</title>
+          <meta property="og:image" content={coverImgUrl} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+        </Head>
+
+        <div className={style.container}>
+          <div
+            className={style.cover_img_container}
+            style={{ backgroundImage: `url('${coverImgUrl}')` }}
+          >
+            <img src={coverImgUrl} alt={title} />
+          </div>
+
+          <div className={style.title}>{title}</div>
+          <div className={style.subTitle}>{subTitle}</div>
+          <div className={style.author}>
+            {author} | {publisher}
+          </div>
+          <div className={style.description}>{description}</div>
+        </div>
+      </>
+    );
+  }
+  ```
+
+<br />
+
+### **`배포하기`**
+
+- vercel 사용 -> Next.js 개발사
+
+  - section02 / server 모두 배포
+
+  ```shell
+  $npm i -g vercel
+  ```
+
+  ```shell
+  vercel
+  ```
+
+<br />
+
+- section02/src/lib 하위에 있는 모든 fetch 함수의 요청 도메인 변경
+
+- 재배포
+
+  ```shell
+  vercel --prod
+  ```
+
+<br />
+
+### **`페이지 라우터 정리`**
+
+- <u>Page Router의 장점</u>
+
+  1. 파일 시스템 기반의 간편한 페이지 라우팅 제공
+
+     - 폴더 구조만으로 페이지 라우팅 사용 가능
+
+     ```
+     pages/index.tsx -> ~/
+
+     pages/search.tsx -> ~/search
+
+     pages/book/index.tsx -> ~/book
+
+
+     - 동적 경로(Dynamic Routes)
+     pages/book/[id].tsx -> ~/book/1
+
+
+     - Catch All Segment
+     pages/book/[...id].tsx -> ~/book/1, ~/book/2/10, ~/book/100/2345/233
+
+
+     - Optional Catch All Segment
+     pages/book/[[...id]].tsx -> ~/book, ~/book/1, ~/book/2/10, ~/book/100/2345/233
+     ```
+
+  <br />
+
+  2. 다양한 방식의 사전 렌더링 제공
+
+     ```
+     유저         브라우저(클라이언트)        서버
+     접속요청 ->
+                                  JS 실행(렌더링)
+                              <-  렌더링 된 HTML
+     FCP      <-  화면에 렌더링
+
+     * FCP 단축
+     ```
+
+     - 서버사이드 렌더링(SSR)
+
+       - 요청이 들어올 때 마다 JS 실행(사전 렌더링)을 진행
+
+       - 상황에 때라 응답 속도가 느려질 수 있음
+
+     - 정적 사이트 생성(SSG)
+
+       - 빌드 타임에 미리 페이지를 사전 렌더링 해 둠
+
+       - 사전 렌더링에 많은 시간이 소요되는 페이지더라도 사용자의 요청에는 매우 빠른 속도로 응답 가능
+
+       - 매번 똑같은 페이지만 응답함, 최신 데이터 반영은 어려움
+
+     - 증분 정적 재생성(ISR)
+
+       - SSG 페이지를 일정 시간마다 재생성
+
+       - 유효 기간에 따라 재생성 가능
+
+       - on-demand 방식으로 Revalidate 요청에 따라 재생성 가능
+
+<br />
+
+- <u>Page Router의 단점</u>
+
+  1. 페이지별 레이아웃 설정이 번거로움
+
+     - 각 페이지별로 레이아웃 관련 코드를 작성해줘야 함
+
+     ```ts
+     export default function App({
+       Component,
+       pageProps
+     }: AppProps & {
+       Component: NextPageWithLayout;
+     }) {
+       const getLayout = Component.getLayout ?? ((Page: ReactNode) => page);
+
+       return (
+         <GlobalLayout>{getLayout(<Component {...pageProps} />)}</GlobalLayout>
+       );
+     }
+     ```
+
+     ```ts
+     export default function Page() {
+      return (
+        ...
+      );
+     }
+
+     Page.getLayout = (page: ReactNode) => {
+      return <SearchableLayout>{page}</SearchableLayout>
+     }
+     ```
+
+  <br />
+
+  2. 데이터 페칭 페이지 컴포넌트에 집중됨
+
+     - getServerSideProps, getStaticProps를 사용해 백엔드 서버로부터 데이터 불러와 메이지 컴포넌트에게 Props로 데이터전달
+
+     ```
+     서버에서 불러온 데이터 -> Page 컴포넌트에 Props로 전달 -> 하위 컴포넌트에 무한 전달
+
+     => 데이터를 전달하는 과정이 번거로움
+     ```
+
+  <br />
+
+  3. 불필요한 컴포넌트들도 JS Bundle에 포함됨
+
+     - FCP 시점 이후 하이드레이션을 위해 JS Bundle로 묶어서 전달하는 과정에서 불필요한 컴포넌트들도 포함되어 전달됨
+
+     ```
+     Q. 불필요한 컴포넌트?
+
+     - 상호작용하는 기능이 없는 컴포넌트
+     => BookItem 컴포넌트 -> Link 태그 -> 상호작용이 없음
+     => 상호작용이 있는 컴포넌트와 없는 컴포넌트가 존재함
+     => 상호작용이 없는 컴포넌트가 JS Bundle에 포함되어 하이드레이션을 위해 한 번 더 실행될 필요 X
+
+
+     Q. 컴포넌트의 실행 수?
+
+     - 컴포넌트 실행은 총 두번
+     1. 사전 렌더링을 위한 JS 실행
+     2. JS Bundle 이후 하이드레이션
+
+
+     - 결론
+     => JS Bundle의 용량이 커짐
+     => 하이드레이션 완료 시점도 늦어짐
+     => 상호작용이 가능한 TTI에 도달하는 시간도 늦어짐
+
+
+     * 하이드레이션 이후: TTI
+     ```
