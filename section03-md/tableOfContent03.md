@@ -403,6 +403,110 @@
 
 ### **`네비게이팅`**
 
+- 페이지 이동은 Client Side Rendering 방식으로 처리 -> Page Router 버전과 동일
+
+- App Router에서는 서버 컴포넌트가 추가되었기 때문에 JS Bundle + RSC Payload 전달
+
+  - JS Bundle에는 클라이언트 컴포넌트만 포함되기 때문
+
+  - JS Bundle: Client Component
+
+  - RSC Payload: Server Component
+
+  ```
+  * 초기 접속 요청 이후
+
+  유저                브라우저(클라리언트)              서버
+  페이지 이동 요청 ->
+                              <- JS Bundle(이동할 페이지에 필요한 컴포넌트)
+                                                  +
+                                              RSC Payload
+
+                                          프리페칭(Pre-Fetching)
+
+                  JS 실행(컴포넌트 교체)
+
+                  <- 페이지 교체
+
+
+  => 이동한 페이지에 클라이언트 컴포넌트가 없는 경우 RSC Payload만 전달됨
+
+  * 프리페칭(Pre-Fetching)
+  - 이동할(현재 페이지에서 이동 가능한) 페이지의 데이터를 미리 불러오는 기능
+  ```
+
+<br />
+
+- next/link의 Link 태그 사용
+
+<br />
+
+- 프로그래매틱한(Programmatic) 페이지 이동
+
+  - 이벤트 핸들러를 통한 페이지 이동
+
+  - App Router 버전인 next/navigation의 useRouter 사용
+
+<br />
+
+- App Router의 Pre-Fetching
+
+  - 이동할(현재 페이지에서 이동 가능한) 페이지의 데이터를 미리 불러오는 기능
+
+  - Static(SSG)페이지와 다르게 동적 페이지(SSR)의 경우 JS Bundle를 포함하지 않고 RSC Payload만 불러옴
+
 <br />
 
 ### **`한입북스 UI 구현하기`**
+
+- 수업자료 받아서 src 디렉토리 교체
+
+- page router와 다른 점
+
+  - queryString을 useRouter에서 바로 사용할 수 없음
+
+  - useSearchParams를 사용해 queryString을 가져옴 -> useEffect 사용
+
+  ```ts
+  "use client";
+
+  import { useEffect, useState } from "react";
+  import { useRouter, useSearchParams } from "next/navigation";
+  import style from "./serachbar.module.css";
+
+  export default function Searchbar() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [search, setSearch] = useState("");
+
+    // router.query.q -> AppRouterInstance 형식에 query 속성이 없음
+    // useSearchParams hook을 사용해야 함
+    const q = searchParams.get("q");
+
+    useEffect(() => {
+      setSearch(q || "");
+    }, [q]);
+
+    const onChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(e.target.value);
+    };
+
+    const onSubmit = () => {
+      if (!search || q === search) return;
+      router.push(`/search?q=${search}`);
+    };
+
+    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        onSubmit();
+      }
+    };
+
+    return (
+      <div className={style.container}>
+        <input value={search} onChange={onChangeSearch} onKeyDown={onKeyDown} />
+        <button onClick={onSubmit}>검색</button>
+      </div>
+    );
+  }
+  ```
