@@ -4,7 +4,7 @@ import { BookData } from "@/types";
 
 async function AllBooks() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book`, {
-    cache: "no-store"
+    cache: "force-cache"
   });
 
   if (!res.ok) {
