@@ -8,7 +8,7 @@
 
   - 장점: 페이지 내부의 데이터를 항상 최신으로 유지 가능
 
-  - 단점: 데이터 요청이 늘어질 경우 모든게 늦어짐
+  - 단점: 데이터 요청이 늘어질 경우 모든 게 늦어짐
 
 - index.tsx 페이지를 SSR 페이지로 변동
 
@@ -51,7 +51,7 @@
 
     - 페이지로 요청이 들어올 때 getServerSideProps 함수가 먼저 동작 -> 서버, 서드파티 등으로부터 데이터 요청 후 페이지 컴포넌트 실행
 
-    - InferGetServerSidePropsType: getServerSideProps 함수의 반환값 타입을 자동으로 추론 => getServerSideProps 함수 사용시 컴포넌트에서 받는 data의 type
+    - InferGetServerSidePropsType: getServerSideProps 함수의 반환 값 타입을 자동으로 추론 => getServerSideProps 함수 사용 시 컴포넌트에서 받는 data의 type
 
   ```ts
   import SearchableLayout from "@/components/searchable-layout";

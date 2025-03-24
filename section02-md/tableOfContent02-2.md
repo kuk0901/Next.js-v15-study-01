@@ -4,7 +4,7 @@
 
 - SSR의 단점을 해결하는 사전 렌더링 방식
 
-- 빌드 타임에 미리 페이지를 사전 렌더링 해 둠
+- 빌드 타임에 미리 페이지를 사전 렌더링해 둠
 
   ```
   1. 빌드타임(Build Time)에 JS 실행(렌더링) 작업이 이뤄짐
@@ -20,7 +20,7 @@
 
 - 장점: 사전 렌더링에 많은 시간이 소요되는 페이지더라도 사용자의 요청에는 매우 빠른 속도로 응답 가능
 
-- 단점: 빌드 타임 이후에는 페이지를 재렌더링 하지 않음 -> 매번 똑같은 페이지만 응답, 즉 최신 데이터 반영은 어려움
+- 단점: 빌드 타임 이후에는 페이지를 재렌더링하지 않음 -> 매번 똑같은 페이지만 응답, 즉 최신 데이터 반영은 어려움
 
 <br />
 
@@ -30,7 +30,7 @@
 
 - 사용 방식은 getServerSideProps 함수와 동일 단, 반환되는 타입은 InferGetStaticPropsType\<typeof getStaticProps>
 
-  - InferGetStaticPropsType: getStaticProps 함수의 반환값 타입을 자동으로 추론 => getStaticProps 함수 사용시 컴포넌트에서 받는 data의 type
+  - InferGetStaticPropsType: getStaticProps 함수의 반환값 타입을 자동으로 추론 => getStaticProps 함수 사용 시 컴포넌트에서 받는 data의 type
 
   ```ts
   // pages/index.tsx
@@ -84,7 +84,7 @@
   };
   ```
 
-- npm run build시 결과 확인 가능
+- npm run build 시 결과 확인 가능
 
   ```shell
   $npm run build
@@ -138,7 +138,7 @@
 
   - 컴포넌트가 마운트 된 이후에 동작하는 형태로 코드 수정 -> useEffect 사용(기존의 React 형태의 방식)
 
-  > 클라이언트 사이드 측에서 직접 페칭해서 불러오도록 설정
+  > 클라이언트 사이드 측에서 직접 페칭 해서 불러오도록 설정
 
   ```ts
   // pages/search/index.tsx
@@ -312,7 +312,7 @@
 
 ### **`SSG 풀백옵션 설정하기`**
 
-- Fallback 옵션 설정(없는 경로로 요청시)
+- Fallback 옵션 설정(없는 경로로 요청 시)
 
   - false: 404 Not Found 반환
 

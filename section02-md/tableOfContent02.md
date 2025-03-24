@@ -238,7 +238,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
 - 일반적으로 Link 컴포넌트를 사용한 경우 프리페칭이 이루어짐
 
-  - 프로그래매틱한 페이지에도 프리페칭을 적용시키고 싶은 경우: useEffect + prefetch()
+  - 프로그래매틱한 페이지에도 프리페칭을 적용 시키고 싶은 경우: useEffect + prefetch()
 
   ```ts
   // _app.tsx
@@ -306,7 +306,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 - 글로벌 css 파일은 App 컴포넌트가 아닌 곳에서는 불러올 수 없음 -> import 사용 제한
 
-  - css 파일 간의 클래스명에 대한 충돌 방지
+  - css 파일 간의 클래스 명에 대한 충돌 방지
 
 > CSS Module 기능 사용: ~~.module.css <br />
 > style 객체는 기본 내보내기
@@ -531,9 +531,9 @@ export default function Home() {
 
 <br />
 
-### **`사전 렌더링과 데이터페칭`**
+### **`사전 렌더링과 데이터 페칭`**
 
-- React App에서의 데이터페칭
+- React App에서의 데이터 페칭
 
   ```ts
   export default function Page() {
@@ -566,7 +566,7 @@ export default function Home() {
 
   <br />
 
-- Next.js의 데이터페칭: 사전 렌더링
+- Next.js의 데이터 페칭: 사전 렌더링
 
   - JS 실행(렌더링) 시점에 현재 페이지에서 필요한 데이터를 미리 요청하고 응답을 받음
 
@@ -594,9 +594,9 @@ export default function Home() {
 
 <br />
 
-- React와 Next.js의 데이터페칭 차이점
+- React와 Next.js의 데이터 페칭 차이점
 
-  | React-app의 데이터페칭                                                          | Next-app의 데이터페칭                                                                                                |
+  | React-app의 데이터 페칭                                                         | Next-app의 데이터페칭                                                                                                |
   | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
   | 컴포넌트 마운트 이후에 발생함 <br /> 데이터 요청 시점이 느려지게 되는 단점 발생 | 사전 렌더링 중 발생함(당연히 컴포넌트 마운트 이후에도 발생 가능) <br /> 데이터 요청 시점이 매우 빨라지는 장점이 있음 |
 
@@ -632,7 +632,7 @@ export default function Home() {
 
 - ISR 주문형 재 검증(On-Demand-ISR)
 
-  - On-Demand-ISR: 요청을 받을 때 마다 페이지를 다시 생성하는 ISR
+  - On-Demand-ISR: 요청을 받을 때마다 페이지를 다시 생성하는 ISR
 
   - 시간을 기반으로 불필요하거나 너무 늦게 페이지를 재생성하는 과정 제거
 
@@ -646,7 +646,7 @@ export default function Home() {
 
 - favicon, thumbnail 등 정적 리소스, 페이지별 meta 태그 사용
 
-- 각 페이지별로 메타 태그 적용을 위해 next/head를 통해 Head import
+- 페이지별로 메타 태그 적용을 위해 next/head를 통해 Head import
 
   - next/document의 Head는 \_document.tsx 파일에서만 사용
 
@@ -721,7 +721,7 @@ export default function Home() {
   };
   ```
 
-- book/[id].tsx처럼 fallback을 사용하는 다니나믹 정적 페이지에서의 메타 태그 사용
+- book/[id].tsx처럼 fallback을 사용하는 다이나믹 정적 페이지에서의 메타 태그 사용
 
   - 조건문을 통한 loading 상태에서의 기본적 메타 태그 사용: book의 데이터가 없는 경우 메타 태그 미적용 -> SEO 동작 X
 
@@ -878,7 +878,7 @@ export default function Home() {
 
      ```
      유저         브라우저(클라이언트)        서버
-     접속요청 ->
+     접속 요청 ->
                                   JS 실행(렌더링)
                               <-  렌더링 된 HTML
      FCP      <-  화면에 렌더링
@@ -886,15 +886,15 @@ export default function Home() {
      * FCP 단축
      ```
 
-     - 서버사이드 렌더링(SSR)
+     - 서버 사이드 렌더링(SSR)
 
-       - 요청이 들어올 때 마다 JS 실행(사전 렌더링)을 진행
+       - 요청이 들어올 때마다 JS 실행(사전 렌더링)을 진행
 
-       - 상황에 때라 응답 속도가 느려질 수 있음
+       - 상황에 따라 응답 속도가 느려질 수 있음
 
      - 정적 사이트 생성(SSG)
 
-       - 빌드 타임에 미리 페이지를 사전 렌더링 해 둠
+       - 빌드 타임에 미리 페이지를 사전 렌더링해 둠
 
        - 사전 렌더링에 많은 시간이 소요되는 페이지더라도 사용자의 요청에는 매우 빠른 속도로 응답 가능
 
@@ -914,7 +914,7 @@ export default function Home() {
 
   1. 페이지별 레이아웃 설정이 번거로움
 
-     - 각 페이지별로 레이아웃 관련 코드를 작성해줘야 함
+     - 각 페이지별로 레이아웃 관련 코드를 작성해 줘야 함
 
      ```ts
      export default function App({
@@ -972,7 +972,7 @@ export default function Home() {
 
      Q. 컴포넌트의 실행 수?
 
-     - 컴포넌트 실행은 총 두번
+     - 컴포넌트 실행은 총 두 번
      1. 사전 렌더링을 위한 JS 실행
      2. JS Bundle 이후 하이드레이션
 
