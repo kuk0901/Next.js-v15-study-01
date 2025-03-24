@@ -365,8 +365,75 @@
 
 ### **`라우트 세그먼트 옵션`**
 
+- 페이지 캐싱/리벨리데이트 동작을 강제로 설정 -> 강제로 특정 페이지를 static, dynamic page 혹은 revalidate 설정
+
+  - 약속된 이름의 변수명을 설정하고 내보냄
+
+  ```
+  - dynamic: 특정 페이지의 유형을 강제로 Static, Dynamic 페이지로 설정
+
+  1. auto
+  => 기본값, 아무것도 강제하지 않음
+
+  2. force-dynamic
+  => 페이지를 강제로 Dynamic 페이지로 설정
+
+  3. force-static
+  => 페이지를 강제로 Static 페이지로 설정
+  => 실시간 검색 페이지에 사용하는 경우 검색어가 빈 값으로 처리되어 검색 결과가 나타나지 않음
+
+  4. error
+  => 페이지를 강제로 Static 페이지로 설정(설정하면 안 되는 이유 O -> 빌드 오류)
+  => 동적 함수, 캐싱되지 않는 데이터 페칭이 있는 경우 빌드 오류
+
+
+  * 동적 함수, 데이터 페칭을 사용하는 것과 별개로 모든 설정을 강제함
+  => 동적 함수: undefined, 빈 값으로 설정됨
+  => 캐싱되지 않는 데이터 페칭: no-store처럼 데이터 캐싱이 되지 않도록 설정된 경우 강제로 캐싱되도록 변경됨
+  ```
+
+> 사용하지 않는 것을 지양<br />
+> 개발 과정에서 버그 찾기에는 수월할 수 있음
+
 <br />
 
 ### **`클라이언트 라우터 캐시`**
+
+- 브라우저에 저장되는 캐시
+
+- 페이지 이동을 효율적으로 진행하기 위해 페이지의 일부 데이터를 보관함
+
+  ```
+  페이지 데이터: HTML, JS Bundle, RSC Payload(레이아웃들, 페이지 및 기타 등등)
+
+  => 여러 개의 페이지가 공통된 레이아웃을 사용하는 경우, 중복되는 데이터(RSC Payload)가 존재할 수 있음
+  => 클라이언트 라우트 캐시에 레이아웃에 해당하는 RSC Payload의 데이터를 캐싱
+  => 한 번 접속한 페이지의 레이아웃을 브라우저 캐시에 캐싱하여 중복 요청을 방지(최적화)
+  ```
+
+  <br />
+
+- new Date().troLocaleString()을 사용해 페이지 간의 이동에서 레이아웃이 캐싱되어 있는지 확인
+
+  - 새로고침, 페이지 새롭게 로드할 경우에는 브라우저의 캐시가 삭제되기 때문에 시간이 변경됨
+
+  ```ts
+  import { ReactNode, Suspense } from "react";
+  import Searchbar from "../../components/searchbar";
+
+  export default function Layout({
+    children
+  }: Readonly<{ children: ReactNode }>) {
+    return (
+      <div>
+        <div>{new Date().toLocaleString()}</div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Searchbar />
+        </Suspense>
+        {children}
+      </div>
+    );
+  }
+  ```
 
 <br />
