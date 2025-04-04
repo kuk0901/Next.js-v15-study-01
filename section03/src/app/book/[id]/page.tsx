@@ -58,7 +58,12 @@ async function BookDetail({ bookId }: Readonly<{ bookId: string }>) {
 
 async function ReviewList({ bookId }: Readonly<{ bookId: string }>) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/review/book/${bookId}`
+    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/review/book/${bookId}`,
+    {
+      next: {
+        tags: [`review-${bookId}`]
+      }
+    }
   );
 
   if (!res.ok) {
