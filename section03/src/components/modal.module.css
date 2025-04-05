@@ -1,0 +1,13 @@
+.modal {
+  width: 80%;
+  max-width: 500px;
+
+  margin-top: 20px;
+  border-radius: 5px;
+  border: none;
+}
+
+/* 배경 속성 */
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
