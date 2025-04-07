@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import style from "./page.module.css";
 
-import { ReviewData } from "@/types";
+import { BookData, ReviewData } from "@/types";
 import ReviewItem from "@/components/review-item";
 import ReviewEditor from "@/components/review-editor";
+import Image from "next/image";
+import { Metadata } from "next";
 
 // export const dynamicParams = false;
 
@@ -44,7 +46,12 @@ async function BookDetail({ bookId }: Readonly<{ bookId: string }>) {
         className={style.cover_img_container}
         style={{ backgroundImage: `url('${coverImgUrl}')` }}
       >
-        <img src={coverImgUrl} />
+        <Image
+          src={coverImgUrl}
+          width={240}
+          height={300}
+          alt={`도서 ${title}의 표지 이미지`}
+        />
       </div>
       <div className={style.title}>{title}</div>
       <div className={style.subTitle}>{subTitle}</div>
@@ -81,6 +88,32 @@ async function ReviewList({ bookId }: Readonly<{ bookId: string }>) {
   );
 }
 
+export async function generateMetadata({
+  params
+}: Readonly<{ params: Promise<{ id: string }> }>): Promise<Metadata> {
+  // id를 이용해 실제 도서의 정보를 사용 -> BookDetail의 fetch 함수 사용
+  const { id } = await params;
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${id}`
+  );
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  const book: BookData = await res.json();
+
+  return {
+    title: `${book.title} - 한입북스`,
+    description: `${book.description}`,
+    openGraph: {
+      title: `${book.title} - 한입북스`,
+      description: `${book.description}`,
+      images: [book.coverImgUrl]
+    }
+  };
+}
+
 export default async function Page({
   params
 }: Readonly<{ params: Promise<{ id: string }> }>) {
@@ -94,13 +127,3 @@ export default async function Page({
     </div>
   );
 }
-
-// * 강의 코드는 params에 대해 Promise 객체로 처리 X
-// export default function Page({ params }: Readonly<{ params: { id: string } }>) {
-//   return (
-//     <div className={style.container}>
-//       <BookDetail bookId={params.id} />
-//       <ReviewEditor />
-//     </div>
-//   );
-// }

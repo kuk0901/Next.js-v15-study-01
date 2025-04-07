@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     fetches: {
       fullUrl: true
     }
+  },
+  images: {
+    domains: ["shopping-phinf.pstatic.net"]
   }
 };
 
