@@ -267,6 +267,54 @@
 
 ### **`배포하기`**
 
+- vercel 통한 배포
+
+- tableOgContent02.md 내용과 동일
+
+- 환경 변수 설정 주의
+
 <br />
 
 ### **`배포 후 최적화`**
+
+> 프로젝트 성능 향상
+
+- 대부분의 페이지를 static 페이지로 변경
+
+  - (with-searchbar)/page.tsx를 static 페이지로 변경(동적 페이지로 변경하는 라우트 세그먼트 제거)
+
+- 실습을 위한 delay 함수 제거
+
+- book/[id]/page.tsx의 generateStaticParams 코드 변경
+
+  - 모든 도서의 페이지를 정적 페이지로 생성
+
+  ```ts
+  export async function generateStaticParams() {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book`);
+
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+
+    const books: BookData[] = await res.json();
+
+    return books.map((book) => ({
+      id: book.id.toString()
+    }));
+  }
+  ```
+
+<br />
+
+- 명령어를 사용한 재배포
+
+  ```shell
+  $vercel --prod
+  ```
+
+<br />
+
+- vercel 플랫폼에서의 최적화
+
+  - Setting/Functions의 Function Region 변경 -> 기존 region 제거 후 서울로 변경
